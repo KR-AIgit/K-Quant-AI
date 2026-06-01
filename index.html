@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0b0f19">
+    <title>K-Quant AI | 실시간 주식 & ETF 수급 동향 분석</title>
+    <meta name="description" content="개별 주식과 ETF의 실시간 수급 동향 분석, 외국인/기관 매매 패턴 추적, AI 심층 애널리스트 리포트 및 소셜 감성 상태를 제공하는 인공지능 시황 분석 대시보드입니다.">
+    
+    <link rel="stylesheet" href="styles.css?v=2.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+    <div class="container">
+        
+        <header class="glass-card">
+            <div class="logo-section">
+                <h1><i class="fa-solid fa-brain-circuit"></i> K-Quant AI</h1>
+                <span>Advanced Stock Intelligence Board</span>
+            </div>
+            
+            <div class="status-indicators">
+                <div class="indicator" id="network-status-container" style="align-items: center;">
+                    <span class="status-dot active" id="network-status-dot"></span>
+                    <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                        <span id="network-status-text">한국거래소 연결 중...</span>
+                        <span id="network-status-subtext" style="font-size: 0.55rem; color: var(--text-muted); margin-top: 2px; display: none;">(잠시 후 자동 업데이트)</span>
+                    </div>
+                </div>
+                <div class="indicator">
+                    <i class="fa-regular fa-clock" style="color: var(--accent-cyan);"></i>
+                    <span id="live-time-text">00:00:00</span>
+                </div>
+                <button id="boss-mode-toggle" class="boss-mode-btn" title="모드 전환" style="background: none; border: none; cursor: pointer; color: var(--text-secondary); padding: 0.2rem; margin-left: 0.5rem; outline: none;">
+                    <i id="icon-default-mode" class="fa-solid fa-file-excel" style="font-size: 1.2rem;"></i>
+                    <i id="icon-boss-mode" class="fa-solid fa-desktop" style="font-size: 1.2rem; display: none;"></i>
+                </button>
+            </div>
+        </header>
+
+        <main class="dashboard-grid">
+            
+            <section class="left-column">
+                
+                                <article class="glass-card selector-card" data-mobile-view="dashboard">
+                    <div class="search-trigger-btn" id="open-search-modal">
+                        <i class="fa-solid fa-magnifying-glass" style="color: var(--accent-purple);"></i>
+                        <span id="current-selected-stock-display">종목 검색 및 분석 종목 선택...</span>
+                    </div>
+                </article>
+
+                <article class="glass-card comparison-card" id="price-card" data-mobile-view="dashboard">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-people-group"></i> 실시간 수급 동향 추정</h3>
+                        <span class="ai-pill">Investor Flow</span>
+                    </div>
+                    
+                    <div class="exchanges-row">
+                        <div class="exchange-price-box bithumb">
+                            <span class="ex-name">외국인 AI 모멘텀 강도</span>
+                            <div class="ex-price" id="flow-foreign">대기 중</div>
+                        </div>
+                        
+                        <div class="exchange-price-box coinone">
+                            <span class="ex-name">기관 AI 모멘텀 강도</span>
+                            <div class="ex-price" id="flow-institution">대기 중</div>
+                        </div>
+                    </div>
+                    
+                    <div class="arbitrage-insight-box">
+                        <span class="arb-label"><i class="fa-solid fa-handshake-angle"></i> 메이저 수급 쌍끌이 모멘텀</span>
+                        <div class="arb-value" id="flow-strength">계산 중...</div>
+                        <div class="arb-desc" id="flow-direction">주가 변동성 기반 외인/기관 수급 강도 추정 중</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">현재가</span>
+                            <span class="stat-val" id="stat-current-price">0 원</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">전일대비 변동률</span>
+                            <span class="stat-val" id="stat-change-rate">0.00%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">당일 거래량</span>
+                            <span class="stat-val" id="stat-volume">0 주</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">시가총액</span>
+                            <span class="stat-val" id="stat-market-cap">0 조</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card ai-trading-card" id="ai-trading-card" data-mobile-view="dashboard">
+                    <div class="card-title-badge">
+                        <h3 style="color: var(--accent-cyan);"><i class="fa-solid fa-crosshairs"></i> [AI 트레이딩]</h3>
+                        <span class="ai-pill" style="background: linear-gradient(135deg, var(--accent-cyan), var(--sentiment-bullish));">Neural Trade v1.0</span>
+                    </div>
+                    
+                    <div class="trading-period-selector">
+                        <button class="period-btn active" data-trade-period="1w">일주일 분석</button>
+                        <button class="period-btn" data-trade-period="1m">한달 분석</button>
+                    </div>
+
+                    <div class="trading-targets">
+                        <div class="target-row entry">
+                            <span class="target-label"><i class="fa-solid fa-right-to-bracket"></i> 적정 매수 밴드</span>
+                            <span class="target-value" id="trade-entry">AI 연산 중...</span>
+                        </div>
+                        
+                        <div class="target-row profit">
+                            <span class="target-label"><i class="fa-solid fa-arrow-trend-up"></i> 단기 목표가 (저항)</span>
+                            <span class="target-value" id="trade-profit">AI 연산 중...</span>
+                        </div>
+                        
+                        <div class="target-row stop">
+                            <span class="target-label"><i class="fa-solid fa-circle-exclamation"></i> 손절/리스크 밴드</span>
+                            <span class="target-value" id="trade-stop">AI 연산 중...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="trading-rationale">
+                        <span class="trading-rationale-title"><i class="fa-solid fa-brain"></i> AI 기술적/수급 설계 근거 분석</span>
+                        <div id="trade-rationale-text">
+                            재무 데이터 및 실시간 호가창 스캔을 통해 신경망 손익비 모델을 산출 중입니다...
+                        </div>
+                    </div>
+                    
+                    <div class="trading-disclaimer">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <span><b>* 실시간 보조지표:</b> 본 예측 데이터는 실시간 통신 과부하 방지를 위해 <b>5분 간격</b>으로 주가를 갱신하여 목표가를 재산출합니다. (마지막 갱신: <b id="trade-last-update">대기 중</b>)</span>
+                    </div>
+                </article>
+
+                <article class="glass-card ai-report-card" data-mobile-view="dashboard">
+                    <div class="ai-header">
+                        <div class="ai-icon-wrapper">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        </div>
+                        <div class="ai-header-text">
+                            <h3>AI 스마트 애널리스트</h3>
+                            <p>Neural Stock Engine v5.0</p>
+                        </div>
+                        <span class="ai-signal-badge strong-buy" id="ai-signal">BUY</span>
+                    </div>
+                    
+                    <div class="ai-report-content">
+                        <div>
+                            <span class="ai-section-title"><i class="fa-solid fa-chart-line"></i> 종합 투자 트렌드 판단</span>
+                            <div class="ai-insight-text" id="ai-trend-summary">
+                                데이터를 분석하여 실시간 종목 리포트를 생성하는 중입니다...
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <span class="ai-section-title"><i class="fa-solid fa-gears"></i> 인공지능 주가 지표계</span>
+                            <div class="ai-tech-stats">
+                                <div class="tech-indicator-item">
+                                    <span class="tech-ind-label">AI 종합 수급강도</span>
+                                    <span class="tech-ind-val" id="tech-ai-score" style="color: var(--sentiment-bullish);">82%</span>
+                                </div>
+                                <div class="tech-indicator-item">
+                                    <span class="tech-ind-label">외국인/기관 포지션</span>
+                                    <span class="tech-ind-val" id="tech-whale-accumulation">집중 매집 중</span>
+                                </div>
+                                <div class="tech-indicator-item">
+                                    <span class="tech-ind-label">RSI 모멘텀 분석</span>
+                                    <span class="tech-ind-val" id="tech-rsi">54.2 (중립 이상)</span>
+                                </div>
+                                <div class="tech-indicator-item">
+                                    <span class="tech-ind-label">MACD 시그널 상태</span>
+                                    <span class="tech-ind-val" id="tech-volatility">골든크로스 발생</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card recommend-links-card" data-mobile-view="community">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-link" style="color: var(--accent-purple);"></i> 추천 리포트 및 기사</h3>
+                        <span class="ai-pill">Reference</span>
+                    </div>
+                    <div class="recommend-links-grid">
+                        <a href="#" target="_blank" class="recommend-link-item" id="link-naver-news">
+                            <div class="recommend-link-icon"><i class="fa-regular fa-newspaper"></i></div>
+                            <div class="recommend-link-text">
+                                <span class="recommend-link-title">네이버 금융 최신 뉴스</span>
+                                <span class="recommend-link-desc">선택된 종목의 가장 빠른 최신 뉴스를 확인하세요.</span>
+                            </div>
+                        </a>
+                        <a href="#" target="_blank" class="recommend-link-item" id="link-naver-research">
+                            <div class="recommend-link-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                            <div class="recommend-link-text">
+                                <span class="recommend-link-title">기업 종목분석 보고서</span>
+                                <span class="recommend-link-desc">기업의 펀더멘털과 재무제표를 깊이 있게 분석합니다.</span>
+                            </div>
+                        </a>
+                        <a href="#" target="_blank" class="recommend-link-item" id="link-hankyung">
+                            <div class="recommend-link-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                            <div class="recommend-link-text">
+                                <span class="recommend-link-title">한경 컨센서스 리포트</span>
+                                <span class="recommend-link-desc">증권사들의 전문가 목표 주가와 리포트를 모아봅니다.</span>
+                            </div>
+                        </a>
+                    </div>
+                </article>
+
+            </section>
+            
+            <section class="right-column">
+                
+                <article class="glass-card insight-card" data-mobile-view="chart">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-graduation-cap" style="color: var(--accent-cyan);"></i> 핵심 지표 인사이트</h3>
+                        <span class="ai-pill" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));">Fundamental Board</span>
+                    </div>
+                    
+                    <div class="insight-grid" id="insight-grid-container">
+                        <!-- PER -->
+                        <div class="insight-box">
+                            <div class="insight-header">
+                                <span class="insight-name">PER (주가수익비율)</span>
+                                <span class="insight-value" id="val-per">대기 중</span>
+                            </div>
+                            <p class="insight-desc" id="desc-per">회사가 버는 돈에 비해 주가가 싼지 비싼지 보여줍니다.</p>
+                        </div>
+                        
+                        <!-- PBR -->
+                        <div class="insight-box">
+                            <div class="insight-header">
+                                <span class="insight-name">PBR (주가순자산비율)</span>
+                                <span class="insight-value" id="val-pbr">대기 중</span>
+                            </div>
+                            <p class="insight-desc" id="desc-pbr">회사를 당장 팔았을 때 남는 재산과 주가를 비교합니다.</p>
+                        </div>
+                        
+                        <!-- ROE -->
+                        <div class="insight-box">
+                            <div class="insight-header">
+                                <span class="insight-name">ROE (자기자본이익률)</span>
+                                <span class="insight-value" id="val-roe">대기 중</span>
+                            </div>
+                            <p class="insight-desc" id="desc-roe">회사가 가진 자본을 얼마나 훌륭하게 굴려서 이익을 내는지 보여줍니다.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card financial-card" data-mobile-view="chart">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-file-invoice-dollar" style="color: var(--accent-cyan);"></i> 기업 재무제표 핵심요약</h3>
+                        <span class="ai-pill" style="background: linear-gradient(135deg, var(--accent-purple), var(--sentiment-bullish));">Financials</span>
+                    </div>
+                    <div class="financial-grid" style="display: flex; gap: 1rem; flex-direction: column; margin-top: 1.2rem;">
+                        <div class="fin-row" style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 700;">최근 연간 매출액</span>
+                            <span id="val-revenue" style="font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">대기 중</span>
+                        </div>
+                        <div class="fin-row" style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 700;">최근 연간 영업이익</span>
+                            <span id="val-op-profit" style="font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 800; color: var(--sentiment-bullish);">대기 중</span>
+                        </div>
+                        <div class="fin-row" style="display: flex; justify-content: space-between; align-items: center; padding: 0.8rem; background: rgba(255,255,255,0.03); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                            <span style="font-size: 0.9rem; color: var(--text-secondary); font-weight: 700;">최근 연간 당기순이익</span>
+                            <span id="val-net-income" style="font-family: var(--font-outfit); font-size: 1.1rem; font-weight: 800; color: var(--text-primary);">대기 중</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card attractiveness-card" data-mobile-view="chart">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-microchip" style="color: var(--accent-cyan);"></i> AI가 보는 기업 가치 매력도</h3>
+                        <span class="ai-pill" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple)); color: #fff;">AI Evaluation</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1.5rem; margin-top: 1.5rem;">
+                        <div class="ai-score-container">
+                            <div class="ai-core-bg"></div>
+                            <div class="ai-core-ring"></div>
+                            <div class="ai-core-value">
+                                <span id="val-score" style="font-family: var(--font-outfit); font-size: 1.6rem; font-weight: 800; color: #fff; text-shadow: 0 0 10px var(--accent-cyan);">85</span>
+                            </div>
+                        </div>
+                        <div style="flex-grow: 1;">
+                            <h4 id="score-title" style="margin: 0 0 0.5rem 0; font-size: 1.1rem; color: var(--accent-cyan);">우수한 투자가치</h4>
+                            <p id="score-desc" style="margin: 0; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;">현재 재무 건전성과 주가 수준을 종합할 때 장기 투자 매력도가 상당히 높습니다.</p>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card info-tab-card" data-mobile-view="chart">
+                    <nav class="tab-nav">
+                        <button class="tab-link active" data-tab="info-tab">종목 개요</button>
+                        <button class="tab-link" data-tab="history-tab">재무 및 연혁</button>
+                        <button class="tab-link" data-tab="ai-tech-tab">AI 수급 진단</button>
+                    </nav>
+                    
+                    <div class="tab-panel active" id="info-tab">
+                        <h4 id="info-coin-title">Samsung Electronics</h4>
+                        <p id="info-coin-desc">종목 정보를 불러오는 중입니다...</p>
+                    </div>
+                    
+                    <div class="tab-panel" id="history-tab">
+                        <h4>주요 재무/이슈 연혁</h4>
+                        <div class="coin-history-timeline" id="history-timeline">
+                        </div>
+                    </div>
+                    
+                    <div class="tab-panel" id="ai-tech-tab">
+                        <h4>AI 모델 수급/재무 진단 리포트</h4>
+                        <p id="ai-tech-desc">수급 및 재무 지표를 정량 분석 중입니다...</p>
+                    </div>
+                </article>
+
+                <article class="glass-card pinned-issue-card" id="pinned-issue-card" data-mobile-view="community">
+                    <div class="pinned-header">
+                        <div class="pinned-title">
+                            <i class="fa-solid fa-thumbtack" style="color: var(--accent-purple);"></i>
+                            <span>오늘의 <span id="pinned-coin-name">종목</span> 핵심 브리핑</span>
+                        </div>
+                        <span class="pinned-badge" id="pinned-sentiment-badge">분석 중...</span>
+                    </div>
+                    <div class="pinned-content">
+                        <h4 id="pinned-issue-title">데이터를 불러오는 중입니다...</h4>
+                        <p id="pinned-issue-desc">한국시간 장 마감 기준으로 최신 AI 동향을 수집하고 있습니다.</p>
+                        <div class="pinned-footer">
+                            <i class="fa-regular fa-clock"></i> <span id="pinned-date-text">0000-00-00 00:00 KST 기준 업데이트</span>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="glass-card news-card" data-mobile-view="community">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-solid fa-newspaper" style="color: var(--accent-cyan);"></i> AI 스마트 센티먼트 증권 뉴스</h3>
+                        <span class="ai-pill" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));">AI Aggregated</span>
+                    </div>
+                    
+                    <div class="news-feed" id="news-feed-container">
+                        <div class="indicator" style="justify-content: center; border: none;">뉴스 데이터를 통합하는 중...</div>
+                    </div>
+                </article>
+
+                <article class="glass-card comments-card" data-mobile-view="community">
+                    <div class="card-title-badge">
+                        <h3><i class="fa-regular fa-comments" style="color: var(--accent-purple);"></i> 실시간 커뮤니티 및 정보공유</h3>
+                        <span class="ai-pill">Community Board</span>
+                    </div>
+                    
+                    <div class="sentiment-analytics">
+                        <div class="analytics-title">
+                            <span>오늘의 소셜 투자 감정 지수</span>
+                            <span id="sentiment-percentage" style="color: var(--sentiment-bullish); font-weight: 700;">상승 0% / 하락 0%</span>
+                        </div>
+                        
+                        <div class="sentiment-bar-container">
+                            <div class="sentiment-bar-fill bullish-fill" id="sentiment-bullish-bar" style="width: 50%;"></div>
+                            <div class="sentiment-bar-fill bearish-fill" id="sentiment-bearish-bar" style="width: 50%;"></div>
+                        </div>
+                        
+                        <div class="analytics-breakdown">
+                            <span class="breakdown-item"><span class="breakdown-bullet bullish"></span>상승 호재 우세</span>
+                            <span class="breakdown-item"><span class="breakdown-bullet bearish"></span>하락 악재 경계</span>
+                        </div>
+                    </div>
+                    
+                    <div class="comments-list" id="comments-container">
+                    </div>
+                    
+                    
+                </article>
+
+            </section>
+            
+        </main>
+        
+        <footer class="dashboard-footer">
+            <div class="footer-content">
+                <p class="footer-brand"><i class="fa-solid fa-brain-circuit" style="color: var(--accent-cyan);"></i> K-Quant AI</p>
+                <p class="footer-desc">
+                    한국(K) 시장에 맞춘 퀀트(계량분석) 인공지능인 <b>K-Quant AI</b>는 실시간 주가 체결 동향 및 외국인/기관 수급 데이터를 기반으로 
+                    누구나 직관적으로 파악할 수 있는 안정적인 기대 손익비 투자 결정을 돕는 지능형 국내 주식 분석 프레임워크입니다.
+                </p>
+                <p class="footer-copy">&copy; 2026 K-Quant AI. Advanced Stock Intelligence Board.</p>
+            </div>
+        </footer>
+        
+        <nav id="mobile-bottom-nav" class="mobile-nav">
+            <button class="nav-item active" data-target="dashboard">
+                <i class="fa-solid fa-chart-pie"></i>
+                <span>대시보드</span>
+            </button>
+            <button class="nav-item" data-target="chart">
+                <i class="fa-solid fa-lightbulb"></i>
+                <span>핵심지표</span>
+            </button>
+            <button class="nav-item" data-target="community">
+                <i class="fa-regular fa-newspaper"></i>
+                <span>뉴스/정보</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="stockCodes.js"></script>
+    <script src="app_v2.js"></script>
+
+    <!-- Search Modal -->
+    <div class="search-modal-overlay" id="search-modal">
+        <div class="search-modal-container glass-card">
+            <button class="close-modal-btn" id="close-search-modal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-search-header">
+                <div class="modal-search-input-group">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="modal-stock-search-input" placeholder="종목명 또는 6자리 코드 입력 (예: 오뚜기, 005930)" />
+                    <button id="modal-stock-search-btn">검색</button>
+                </div>
+            </div>
+            
+            <div class="modal-stock-lists">
+                <!-- KOSPI Column -->
+                <div class="stock-list-column">
+                    <h4 class="list-column-title"><i class="fa-solid fa-building"></i> 국내 시가총액 Top 10 종목</h4>
+                    <div class="stock-grid" id="kospi-grid">
+                        <button class="modal-stock-btn" data-code="005930">1. 삼성전자</button>
+                        <button class="modal-stock-btn" data-code="000660">2. SK하이닉스</button>
+                        <button class="modal-stock-btn" data-code="373220">3. LG에너지솔루션</button>
+                        <button class="modal-stock-btn" data-code="207940">4. 삼성바이오로직스</button>
+                        <button class="modal-stock-btn" data-code="005380">5. 현대차</button>
+                        <button class="modal-stock-btn" data-code="000270">6. 기아</button>
+                        <button class="modal-stock-btn" data-code="068270">7. 셀트리온</button>
+                        <button class="modal-stock-btn" data-code="105560">8. KB금융</button>
+                        <button class="modal-stock-btn" data-code="005490">9. POSCO홀딩스</button>
+                        <button class="modal-stock-btn" data-code="035420">10. NAVER</button>
+                    </div>
+                </div>
+                <!-- KOSDAQ/ETF Column -->
+                <div class="stock-list-column">
+                    <h4 class="list-column-title"><i class="fa-solid fa-layer-group"></i> 거래량/시가총액 Top 10 ETF</h4>
+                    <div class="stock-grid" id="kosdaq-grid">
+                        <button class="modal-stock-btn" data-code="069500">1. KODEX 200</button>
+                        <button class="modal-stock-btn" data-code="357870">2. TIGER CD금리투자</button>
+                        <button class="modal-stock-btn" data-code="122630">3. KODEX 레버리지</button>
+                        <button class="modal-stock-btn" data-code="114800">4. KODEX 인버스</button>
+                        <button class="modal-stock-btn" data-code="360750">5. TIGER 미국S&P500</button>
+                        <button class="modal-stock-btn" data-code="381180">6. TIGER 미국테크TOP10</button>
+                        <button class="modal-stock-btn" data-code="252670">7. KODEX 200선물인버스2X</button>
+                        <button class="modal-stock-btn" data-code="430220">8. KODEX KOFR금리액티브</button>
+                        <button class="modal-stock-btn" data-code="305080">9. TIGER 2차전지테마</button>
+                        <button class="modal-stock-btn" data-code="251340">10. KODEX 코스닥150선물인버스</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
