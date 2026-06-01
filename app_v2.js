@@ -379,12 +379,7 @@ function setupEventListeners() {
 
     const commentForm = document.getElementById("comment-form");
     
-    // Legacy search removed);
-        
-        searchInput.addEventListener("keypress", (e) => {
-            if (e.key === "Enter") searchBtn.click();
-        });
-    }
+    // Legacy search removed
     if (commentForm) { commentForm.addEventListener("submit", handleCommentSubmit); }
 
     const mobileNavItems = document.querySelectorAll(".nav-item");
